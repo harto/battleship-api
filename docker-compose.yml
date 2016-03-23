@@ -1,13 +1,29 @@
 version: "2"
 
 services:
+
   app:
+    build: .
     command: npm start
     environment:
+      DB_NAME: battleship-dev
+      DB_PASS: battleship-dev
+      DB_USER: battleship-dev
       DEBUG: battleship:*
-    image: node:4.4
+      PGHOST: db
+      PGUSER: battleship-dev
     ports:
       - "3000:3000"
     volumes:
       - .:/usr/src/app
     working_dir: /usr/src/app
+
+  db:
+    image: postgres:9.5
+    volumes_from:
+      - db_data
+
+  db_data:
+    image: tianon/true
+    volumes:
+      - /var/lib/postgresql/data

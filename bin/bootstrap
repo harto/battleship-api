@@ -1,0 +1,20 @@
+#!/usr/bin/env bash -euo pipefail
+
+cd "$(dirname $0)"/..
+
+if ! docker-compose ps | grep -Eq '_db_1 .+ Up'; then
+  docker-compose up -d db
+  # await DB startup
+  sleep 5
+fi
+
+docker-compose run app bash -c '
+  if psql --username=$DB_USER --command="select 1" $DB_NAME &>/dev/null; then
+    echo "Database initialised; skipping"
+  else
+    echo "Initialising database"
+    createuser --user=postgres --no-password --echo $DB_USER
+    createdb --user=postgres --no-password --echo $DB_NAME
+    node bin/init-db.js
+  fi
+'
