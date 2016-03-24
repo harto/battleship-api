@@ -57,7 +57,6 @@ Game.belongsTo(Player, {
 });
 Game.belongsTo(Player, {
     as: 'player2',
-    foreignKey: {allowNull: false},
     onDelete: 'CASCADE'
 });
 
