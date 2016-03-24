@@ -6,6 +6,7 @@ services:
     build: .
     command: npm start
     environment:
+      CONTAINERISED: 1
       DB_NAME: battleship-dev
       DB_PASS: battleship-dev
       DB_USER: battleship-dev

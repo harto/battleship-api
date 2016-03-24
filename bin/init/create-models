@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+'use strict';
+
+console.log(`synchronising ${process.env.DB_NAME}...`);
+const models = require('../../models/index');
+const db = require('../../models/database');
+db.sync().then(() => {
+    console.log('done');
+    // hurry up
+    process.exit(0);
+});

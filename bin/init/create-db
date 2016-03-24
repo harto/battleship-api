@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DB_ENV=$1
+
+if [[ $DB_ENV == dev ]]; then
+  export DB_NAME=battleship-dev
+  export DB_USER=battleship-dev
+else
+  export DB_NAME=battleship-test
+  export DB_USER=battleship-test
+fi
+
+if psql --username=$DB_USER --command="select 1" $DB_NAME &>/dev/null; then
+  echo "$DB_NAME initialised; skipping"
+  exit
+fi
+
+echo "creating $DB_NAME"
+createuser --user=postgres --no-password --echo $DB_USER
+createdb --user=postgres --no-password --echo --owner=$DB_USER $DB_NAME
+bin/init/create-models

@@ -1,6 +1,12 @@
-#!/usr/bin/env bash -euo pipefail
+#!/usr/bin/env bash
+set -eo pipefail
 
-cd "$(dirname $0)"/..
+if [[ -n $CONTAINERISED ]]; then
+  echo "run from host, not container" >&2
+  exit 1
+fi
+
+set -u
 
 if ! docker-compose ps | grep -Eq '_db_1 .+ Up'; then
   docker-compose up -d db
@@ -8,13 +14,5 @@ if ! docker-compose ps | grep -Eq '_db_1 .+ Up'; then
   sleep 5
 fi
 
-docker-compose run app bash -c '
-  if psql --username=$DB_USER --command="select 1" $DB_NAME &>/dev/null; then
-    echo "Database initialised; skipping"
-  else
-    echo "Initialising database"
-    createuser --user=postgres --no-password --echo $DB_USER
-    createdb --user=postgres --no-password --echo $DB_NAME
-    node bin/init-db.js
-  fi
-'
+docker-compose run app bash -c 'bin/init/create-db dev
+                                bin/init/create-db test'

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+if [[ -z $CONTAINERISED ]]; then
+  docker-compose run app $0
+  exit $?
+fi
+
+set -u
+
+export DB_NAME=battleship-test
+export DB_USER=battleship-test
+export DB_PASS=battleship-test
+
+bin/init/create-models &>/dev/null
+npm --quiet test
